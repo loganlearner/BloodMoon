@@ -1,17 +1,39 @@
 package me.OverlordBleck.BloodMoon;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
+import org.bukkit.Location;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 public class BloodMoonListener implements Listener {
-	@EventHandler
-	public void onMobSpawn(EntitySpawnEvent event) {
-		Entity ent = (Entity) event.getEntity();
-		
-		Bukkit.getLogger().info("SOMEONE PLEASE");
-		Bukkit.getLogger().info(ent.getType().getEntityClass().getName());
-	}
+    Player closestPlayer( Location loc ) {
+        Player closest = null;
+        double closestDist = Double.POSITIVE_INFINITY;
+
+        for ( Player ply : Bukkit.getOnlinePlayers() ) {
+            Double dist = loc.distanceSquared( ply.getLocation() );
+
+            if ( dist < closestDist ) {
+                closest = ply;
+                closestDist = dist;
+            }
+        }
+
+        return closest;
+    }
+
+    @EventHandler
+    public void onMobSpawn( CreatureSpawnEvent event ) {
+        Entity ent = event.getEntity();
+
+        if ( BloodMoon.instance.isBloodMoon() ) {
+            if ( ent instanceof Monster ) {
+                if ( ( ent instanceof Zombie ) || ( ent instanceof Skeleton ) || ( ent instanceof Spider ) ) {
+                    ( (Monster) ent ).setTarget( closestPlayer( ent.getLocation() ) );
+                }
+            }
+        }
+    }
 }
