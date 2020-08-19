@@ -3,3 +3,12 @@ name: BloodMoon
 version: 1.0
 author: OverlordBleck
 api-version: 1.16
+
+commands:
+  reload:
+    description: Reloads blood moon configuration
+
+permissions:
+  bloodmoon.reload:
+    description: Gives access to players reloading the blood moon config
+    default: false

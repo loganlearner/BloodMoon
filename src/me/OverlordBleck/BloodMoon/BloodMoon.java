@@ -1,5 +1,6 @@
 package me.OverlordBleck.BloodMoon;
 
+import me.OverlordBleck.BloodMoon.commands.BloodMoonReload;
 import me.OverlordBleck.BloodMoon.listeners.BloodMoonListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,6 +28,8 @@ public class BloodMoon extends JavaPlugin {
         BloodMoonConfig.getConfig().addDefault( "BloodMoonRateMultiplier", "2" );
         BloodMoonConfig.getConfig().options().copyDefaults( true );
         BloodMoonConfig.saveConfig();
+
+        getCommand( "reload" ).setExecutor( new BloodMoonReload() );
 
         setupDefaults();
         setupInstance();
