@@ -93,7 +93,6 @@ public class BloodMoon extends JavaPlugin {
 
             @Override
             public void run() {
-                Bukkit.getLogger().info( "tick" );
                 if ( isNightTime( overworld ) ) {
                     if ( !isBloodMoon() && !didTry ) {
                         double chance = Double.parseDouble( BloodMoonConfig.getConfig().getString( "BloodMoonRateMultiplier" ) );
