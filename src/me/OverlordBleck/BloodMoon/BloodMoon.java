@@ -1,5 +1,6 @@
 package me.OverlordBleck.BloodMoon;
 
+import me.OverlordBleck.BloodMoon.listeners.BloodMoonListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -17,6 +18,16 @@ public class BloodMoon extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getConfig().options().copyDefaults();
+        saveDefaultConfig();
+
+        BloodMoonConfig.setupConfig();
+        BloodMoonConfig.getConfig().addDefault( "BloodMoonChance", "5" );
+        BloodMoonConfig.getConfig().addDefault( "BloodMoonLimitMultiplier", "2" );
+        BloodMoonConfig.getConfig().addDefault( "BloodMoonRateMultiplier", "2" );
+        BloodMoonConfig.getConfig().options().copyDefaults( true );
+        BloodMoonConfig.saveConfig();
+
         setupDefaults();
         setupInstance();
         setupScheduler();
@@ -49,8 +60,12 @@ public class BloodMoon extends JavaPlugin {
 
     private void startBloodMoon( World world ) {
         getServer().broadcastMessage( ChatColor.DARK_RED + "[Blood Moon] Initiating" );
-        world.setMonsterSpawnLimit( defaultSpawnLimit * 2 );
-        world.setTicksPerMonsterSpawns( defaultSpawnRates * 2 );
+
+        int limitMult = Integer.parseInt( BloodMoonConfig.getConfig().getString( "BloodMoonLimitMultiplier" ) );
+        int rateMult = Integer.parseInt( BloodMoonConfig.getConfig().getString( "BloodMoonRateMultiplier" ) );
+
+        world.setMonsterSpawnLimit( defaultSpawnLimit * limitMult );
+        world.setTicksPerMonsterSpawns( defaultSpawnRates * rateMult );
 
         Bukkit.getLogger().info( String.valueOf( world.getMonsterSpawnLimit() ) );
         Bukkit.getLogger().info( String.valueOf( world.getTicksPerMonsterSpawns() ) );
@@ -68,20 +83,21 @@ public class BloodMoon extends JavaPlugin {
         Bukkit.getLogger().info( String.valueOf( defaultSpawnRates ) );
 
         activeBloodMoon = false;
-        didTry = false;
     }
 
     private void setupScheduler() {
         BukkitScheduler scheduler = getServer().getScheduler();
 
         scheduler.scheduleSyncRepeatingTask( this, new Runnable() {
-            final World overworld = Bukkit.getWorlds().get( 0 );
+            World overworld = Bukkit.getWorlds().get( 0 );
 
             @Override
             public void run() {
+                Bukkit.getLogger().info( "tick" );
                 if ( isNightTime( overworld ) ) {
                     if ( !isBloodMoon() && !didTry ) {
-                        boolean shouldStart = ( Math.random() < 0.05D );
+                        double chance = Double.parseDouble( BloodMoonConfig.getConfig().getString( "BloodMoonRateMultiplier" ) );
+                        boolean shouldStart = ( Math.random() < ( chance / 100 ) );
 
                         Bukkit.getLogger().info( "Attempting Blood Moon" );
 
@@ -97,6 +113,8 @@ public class BloodMoon extends JavaPlugin {
                 } else {
                     if ( isBloodMoon() )
                         stopBloodMoon( overworld );
+
+                    didTry = false;
                 }
             }
         }, 0L, 10L );
