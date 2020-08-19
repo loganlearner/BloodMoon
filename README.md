@@ -1,2 +1,2 @@
 # BloodMoon
-[WIP] PaperMC Blood Moon Plugin
+[V1.0] PaperMC Blood Moon Plugin
